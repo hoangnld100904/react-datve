@@ -17,6 +17,8 @@ const seatsReducer = (state = { selectedSeats: [], bookedSeats: [], hoverSeat: '
       return {
         ...state, hoverSeat: ''
       };
+    case 'RESET_SEATS':
+      return { ...state, selectedSeats: [], bookedSeats: [], hoverSeat: '' };
     default:
       return state;
   }
@@ -40,6 +42,7 @@ const Theater = () => {
     } else {
       dispatch({ type: 'SELECT_SEAT', seat });
     }
+
   };
 
   const handleMouseEnter = seat => {
@@ -51,50 +54,53 @@ const Theater = () => {
   const handleMouseLeave = () => {
     dispatch({ type: 'UNHOVER_SEAT' });
   };
+  const handleReset = () => {
+    dispatch({ type: 'RESET_SEATS' });}
 
-  // Render theater layout with seats
-  return (
-    <div>
-      <div>Seats:</div>
+    // Render theater layout with seats
+    return (
       <div>
-        {['A', 'B', 'C', 'D', 'E', 'F'].map(row => (
-          <div key={row}>
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(seat => (
+        <div>Seats:</div>
+        <div>
+          {['A', 'B', 'C', 'D', 'E', 'F'].map(row => (
+            <div key={row}>
+              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(seat => (
 
-              <button
-                key={seat}
-                className={`seat ${bookedSeats.includes(`${row}${seat}`) ? 'booked' : selectedSeats.includes(`${row}${seat}`) ? 'selected' : hoverSeat === `${row}${seat}` ? 'hover' : ''}`}
-                onClick={() => handleClick(`${row}${seat}`)}
-                onMouseEnter={() => handleMouseEnter(`${row}${seat}`)}
-                onMouseLeave={handleMouseLeave}
-                disabled={bookedSeats.includes(`${row}${seat}`)}
-              >
-                {`${row}${seat}`}
-              </button>
-            ))}
-          </div>
-        ))}
+                <button
+                  key={seat}
+                  className={`seat ${bookedSeats.includes(`${row}${seat}`) ? 'booked' : selectedSeats.includes(`${row}${seat}`) ? 'selected' : hoverSeat === `${row}${seat}` ? 'hover' : ''}`}
+                  onClick={() => handleClick(`${row}${seat}`)}
+                  onMouseEnter={() => handleMouseEnter(`${row}${seat}`)}
+                  onMouseLeave={handleMouseLeave}
+                  disabled={bookedSeats.includes(`${row}${seat}`)}
+                >
+                  {`${row}${seat}`}
+                </button>
+              ))}
+            </div>
+          ))}
+        </div>
+        <div>
+          <button onClick={() => dispatch({ type: 'BOOK_SEAT' })} disabled={selectedSeats.length === 0}>
+            Đặt vé
+          </button>
+          <button onClick={handleReset}>Reset</button>
+        </div>
+        <div>
+          Selected seats: {selectedSeats.join(', ')}
+        </div>
+        <div>
+          Booked seats: {bookedSeats.join(', ')}
+        </div>
       </div>
-      <div>
-        <button onClick={() => dispatch({ type: 'BOOK_SEAT' })} disabled={selectedSeats.length === 0}>
-          Đặt vé
-        </button>
-      </div>
-      <div>
-        Selected seats: {selectedSeats.join(', ')}
-      </div>
-      <div>
-        Booked seats: {bookedSeats.join(', ')}
-      </div>
-    </div>
+    );
+  };
+
+  // App component
+  const App = () => (
+    <Provider store={store}>
+      <Theater />
+    </Provider>
   );
-};
 
-// App component
-const App = () => (
-  <Provider store={store}>
-    <Theater />
-  </Provider>
-);
-
-export default App;
+  export default App;
